@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "generateur-front": {
+    "generateur-plats-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/generateur-front",
+            "outputPath": "dist/generateur-plats-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -29,17 +29,18 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@ant-design/icons-angular/src/inline-svg/",
+                "output": "/assets/"
               }
             ],
             "styles": [
+              "src/theme.less",
               "src/styles.scss"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -69,10 +70,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "generateur-front:build:production"
+              "buildTarget": "generateur-plats-frontend:build:production"
             },
             "development": {
-              "buildTarget": "generateur-front:build:development"
+              "buildTarget": "generateur-plats-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -105,6 +106,6 @@
     }
   },
   "cli": {
-    "analytics": "89ea5fb2-a084-4ba7-b6d4-ad92468699ce"
+    "analytics": "a526f9d1-b8a8-452d-8868-8a3ae762fe85"
   }
 }
