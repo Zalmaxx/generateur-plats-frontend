@@ -21,7 +21,7 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copier les fichiers construits d'Angular vers Nginx
-COPY --from=build /app/dist/generateur-plats-frontend /usr/share/nginx/html
+COPY --from=build /app/dist/generateur-plats-frontend/browser /usr/share/nginx/html
 
 # Exposer le port 80 pour Nginx
 EXPOSE 80
