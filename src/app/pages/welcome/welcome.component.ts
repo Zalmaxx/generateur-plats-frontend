@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {HttpClient, HttpResponse} from "@angular/common/http";
-import {map} from "rxjs";
 import {ApiService} from "../../services/api.service";
 
 @Component({
@@ -16,8 +14,8 @@ export class WelcomeComponent implements OnInit {
 
   ngOnInit() {
     this.apiService.fonction().subscribe({
-      next: (value: string | null) => {
-        this.version = value || null
+      next: (value: any) => {
+        this.version = value.version
       }
     })
   }
