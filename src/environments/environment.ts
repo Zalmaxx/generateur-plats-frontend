@@ -1,3 +1,3 @@
 export const environment = {
-  apiUrl: process.env["API_URL"] || 'http://no-domaine-provide',
+  apiUrl: (window as any).env?.API_URL || 'http://no-domaine-provide',
 };

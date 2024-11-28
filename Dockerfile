@@ -23,6 +23,12 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copier les fichiers construits d'Angular vers Nginx
 COPY --from=build /app/dist/generateur-plats-frontend /usr/share/nginx/html
 
+# Copier le script de création du fichier config.js
+COPY create-env-config.sh /docker-entrypoint.d/
+
+# Rendre le script exécutable
+RUN chmod +x /docker-entrypoint.d/create-env-config.sh
+
 # Exposer le port 80 pour Nginx
 EXPOSE 80
 
