@@ -11,7 +11,7 @@ export class ApiService {
   constructor(private http:HttpClient) { }
 
   fonction(): Observable<string | null> {
-    return this.http.get<string>(this.url, {observe: "response"}).pipe(
+    return this.http.get<string>(`${this.url}/version`, {observe: "response"}).pipe(
       map((value:HttpResponse<string>)=> {
         console.log(value.body)
         return value.body
