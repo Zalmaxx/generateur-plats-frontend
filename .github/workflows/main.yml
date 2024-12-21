@@ -58,28 +58,43 @@ jobs:
         run: echo "TAG=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
+        id: meta_ok
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=sha
 
-      - name: Build and push Docker image to GitHub Container Registry
-        id: push
-        uses: docker/build-push-action@v4
+      - name: Setup variables
+        id: output_variables
+        run: |
+          echo $DOCKER_METADATA_OUTPUT_JSON
+          image_tag=$(echo "$DOCKER_METADATA_OUTPUT_JSON" | jq -r '.tags[] | select(. | test("sha-"))')
+          echo $image_tag
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        id: push_o
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          labels: ${{ steps.meta_ok.outputs.labels }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
 
       - name: Log in to Azure Container Registry
         uses: azure/docker-login@v1
