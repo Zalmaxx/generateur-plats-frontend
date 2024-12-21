@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Build and Push Docker Image
 
 on:
   push:
@@ -6,106 +6,45 @@ on:
       - main
 
 jobs:
-  build-angular:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Angular app
-        run: npm run build -- --configuration=production
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: dist/generateur-plats-frontend
-
   build:
     runs-on: ubuntu-latest
-    needs: build-angular
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download JAR artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist/generateur-plats-frontend
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v2
 
-      - name: Define image tag
+      - name: Get short commit
         id: vars
-        run: echo "TAG=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
+        run: echo "::set-output name=short_commit::$(git rev-parse --short HEAD)"
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta_ok
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup variables
-        id: output_variables
-        run: |
-          echo $DOCKER_METADATA_OUTPUT_JSON
-          image_tag=$(echo "$DOCKER_METADATA_OUTPUT_JSON" | jq -r '.tags[] | select(. | test("sha-"))')
-          echo $image_tag
-          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
-
-      - name: Build and push Docker image
-        id: push_o
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      - name: Build and push to GitHub Container Registry
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
-          labels: ${{ steps.meta_ok.outputs.labels }}
-
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          tags: ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ github.event.release.tag_name }}-${{ steps.vars.outputs.short_commit }}
 
       - name: Log in to Azure Container Registry
-        uses: azure/docker-login@v1
+        uses: docker/login-action@v2
         with:
-          login-server: ${{ vars.AZURE_REGISTRY }}
+          registry: ${{ vars.AZURE_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and push Docker image to Azure Container Registry
-        run: |
-          docker build -t ${{ vars.AZURE_REGISTRY }}/angular-app:${{ env.TAG }} .
-          docker push ${{ vars.AZURE_REGISTRY }}/angular-app:${{ env.TAG }}
-        continue-on-error: true
+      - name: Build and push to Azure Container Registry
+        if: always()
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ vars.AZURE_REGISTRY }}/${{ github.repository }}:latest, ${{ vars.AZURE_REGISTRY }}/${{ github.repository }}:${{ github.event.release.tag_name }}-${{ steps.vars.outputs.short_commit }}
