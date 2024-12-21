@@ -23,6 +23,9 @@ jobs:
       - name: Set environment variables
         run: echo "REPO_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Set environment variables
+        run: echo $GITHUB_TOKEN
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
