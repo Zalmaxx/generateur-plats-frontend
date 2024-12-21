@@ -17,18 +17,21 @@
           <li nz-menu-item nzMatchRouter>
             <a routerLink="/welcome">Welcome</a>
           </li>
-          <li nz-menu-item nzMatchRouter>
-            <a>Monitor</a>
-          </li>
-          <li nz-menu-item nzMatchRouter>
-            <a>Workplace</a>
-          </li>
         </ul>
       </li>
-      <li nz-submenu nzOpen nzTitle="Form" nzIcon="form">
+      <li nz-submenu nzOpen nzTitle="On s'en branle" nzIcon="form">
         <ul>
           <li nz-menu-item nzMatchRouter>
-            <a>Basic Form</a>
+            <a (click)="easterEggs()">Regardez pas ça</a>
+          </li>
+          <li nz-menu-item nzMatchRouter>
+            <a (click)="easterEggs()">Ca ne marche pas</a>
+          </li>
+          <li nz-menu-item nzMatchRouter>
+            <a (click)="easterEggs()">Flemme d'en faire</a>
+          </li>
+          <li nz-menu-item nzMatchRouter>
+            <a (click)="easterEggs()">Quelque chose</a>
           </li>
         </ul>
       </li>
@@ -37,12 +40,16 @@
   <nz-layout>
     <nz-header>
       <div class="app-header">
+
         <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
             <span class="trigger"
                nz-icon
                [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
             ></span>
+
         </span>
+        <span>A - CDC (API - Cat Duck Coffee) <nz-tag>{{version}}</nz-tag></span>
+
       </div>
     </nz-header>
     <nz-content>

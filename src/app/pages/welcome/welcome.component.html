@@ -1,3 +1,29 @@
-<p>A - CDC : API - Cat Duck Coffee</p>
-
-{{version}}
+<div class="container" [ngStyle]="{'background-image': 'url(' + (easterEggs ? easteregg : imageHttp) + ')'}">
+  <div class="image-container">
+    <div class="select-container">
+      <nz-select [(ngModel)]="choix" nzSize="large" nzPlaceHolder="Choisissez une option">
+        <nz-option nzValue="aleatoire" nzLabel="Aléatoire"></nz-option>
+        <nz-option nzValue="chat" nzLabel="Chat"></nz-option>
+        <nz-option nzValue="canard" nzLabel="Canard"></nz-option>
+        <nz-option nzValue="café" nzLabel="Café"></nz-option>
+      </nz-select>
+    </div>
+    <div class="button-container">
+      <button nz-button nzType="primary" nzShape="round" nzSize="large" (click)="getImage()">
+        Recharger une nouvelle image
+      </button>
+    </div>
+    <span>Image {{choix === "aleatoire" ? 'aléatoire' : ('de ' + choix)}}</span>
+    <nz-spin [nzSpinning]="isLoading" nzTip="Chargement...">
+    <img
+      nz-image
+      width="300px"
+      height="300px"
+      [nzSrc]="image"
+      alt=""
+      ngSrc=""/>
+    </nz-spin>
+    <p *ngIf="messageErreur" class="message-erreur">{{messageErreur}}</p>
+  </div>
+  <p class="message-eg" *ngIf="easterEggs">Je t'avais dit de ne pas cliquer la ou sa sert à rien. Maintenant il n'y a plus de chat pour montrer le status de la requête HTTP</p>
+</div>

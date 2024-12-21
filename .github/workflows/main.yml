@@ -53,6 +53,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Define image tag
+        id: vars
+        run: echo "TAG=1.0.0-${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and push Docker image to GitHub Container Registry
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/angular-app:${{ env.TAG }} .
+          docker push ghcr.io/${{ github.repository_owner }}/angular-app:${{ env.TAG }}
+
       - name: Log in to Azure Container Registry
         uses: azure/docker-login@v1
         with:
@@ -60,8 +72,8 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image to Azure Container Registry
         run: |
-          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
-          docker build -t ${{ vars.AZURE_REGISTRY }}/angular-app:${SHORT_SHA} .
-          docker push ${{ vars.AZURE_REGISTRY }}/angular-app:${SHORT_SHA}
+          docker build -t ${{ vars.AZURE_REGISTRY }}/angular-app:${{ env.TAG }} .
+          docker push ${{ vars.AZURE_REGISTRY }}/angular-app:${{ env.TAG }}
+        continue-on-error: true
