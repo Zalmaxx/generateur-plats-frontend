@@ -29,7 +29,7 @@
     "@angular/cli": "^18.2.4",
     "@angular/compiler-cli": "^18.2.0",
     "@types/jasmine": "~5.1.0",
-    "@types/node": "^22.10.0",
+    "@types/node": "^22.10.2",
     "dotenv-webpack": "^8.1.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
