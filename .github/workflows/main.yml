@@ -54,3 +54,12 @@ jobs:
           context: .
           push: true
           tags: ${{ vars.AZURE_REGISTRY }}/angular-app:latest, ${{ vars.AZURE_REGISTRY }}/angular-app:1.0.0-${{ steps.vars.outputs.short_commit }}
+
+      - name: Official SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_URL }}
+        with:
+          projectBaseDir: pokeapi
+          args: '-Dsonar.projectKey=Acdc-frontend'
