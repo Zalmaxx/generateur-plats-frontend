@@ -62,5 +62,5 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_URL }}
         with:
-          projectBaseDir: pokeapi
-          args: '-Dsonar.projectKey=Acdc-frontend'
+          projectBaseDir: .
+          args: '-Dsonar.projectKey=ACDC'
