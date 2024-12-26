@@ -9,6 +9,7 @@ fi
 # Créer le fichier config.js avec la valeur de API_URL
 cat <<EOF > /usr/share/nginx/html/assets/config.js
 window.env = {
-  API_URL: "$API_URL"
+  API_URL: "$API_URL",
+  APP_INSIGHT_KEY: "$APP_INSIGHT_KEY"
 };
 EOF

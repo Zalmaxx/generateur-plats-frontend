@@ -10,9 +10,37 @@ import fr from '@angular/common/locales/fr';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient } from '@angular/common/http';
+import {ApplicationInsights} from "@microsoft/applicationinsights-web";
+import {environment} from "../environments/environment";
 
 registerLocaleData(fr);
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideNzIcons(icons), provideNzI18n(fr_FR), importProvidersFrom(FormsModule), provideAnimationsAsync(), provideHttpClient()]
+  providers: [{
+    provide: 'APP_INITIALIZER',
+    useFactory: () => {
+      const appInsights = new ApplicationInsights({
+        config: {
+          instrumentationKey: environment.appInsightKey, // Remplacez par votre clé
+          enableAutoRouteTracking: true, // Active le suivi des changements de route
+        },
+      });
+
+      appInsights.loadAppInsights();
+
+      // Suivi des vues de pages
+      appInsights.trackPageView();
+
+      return () => {}; // Placeholder pour APP_INITIALIZER
+    },
+    multi: true,
+  },
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideNzIcons(icons),
+    provideNzI18n(fr_FR),
+    importProvidersFrom(FormsModule),
+    provideAnimationsAsync(),
+    provideHttpClient()
+  ]
 };
