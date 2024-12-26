@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
+import {ApplicationConfig, provideZoneChangeDetection, importProvidersFrom, APP_INITIALIZER} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -17,19 +17,23 @@ registerLocaleData(fr);
 
 export const appConfig: ApplicationConfig = {
   providers: [{
-    provide: 'APP_INITIALIZER',
-    useFactory: () => {
+    provide: APP_INITIALIZER,
+    useFactory: () => () => {
+      console.log('Application Insights Key:', environment.appInsightKey.slice(0, 5) + '...');
       const appInsights = new ApplicationInsights({
         config: {
           instrumentationKey: environment.appInsightKey, // Remplacez par votre clé
           enableAutoRouteTracking: true, // Active le suivi des changements de route
+          disableAjaxTracking: false, // Active le suivi des requêtes AJAX
         },
       });
 
       appInsights.loadAppInsights();
 
       // Suivi des vues de pages
-      appInsights.trackPageView();
+      appInsights.trackPageView({
+        name: window.location.pathname
+      });
 
       return () => {}; // Placeholder pour APP_INITIALIZER
     },
