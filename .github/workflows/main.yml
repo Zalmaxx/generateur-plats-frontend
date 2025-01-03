@@ -63,4 +63,4 @@ jobs:
           SONAR_HOST_URL: ${{ vars.SONAR_URL }}
         with:
           projectBaseDir: .
-          args: '-Dsonar.projectKey=ACDC'
+          args: '-Dsonar.projectKey=ACDC-FRONTEND'
