@@ -21,7 +21,7 @@ export class ApiService {
   getImage(parametre?: string): Observable<any> {
     let params: HttpParams = new HttpParams()
     if (parametre) {
-      params = params.append("parametre", parametre)
+      params = params.append("type", parametre)
     }
     return this.http.get<string>(`${this.url}/image`, {params, observe: "response"}).pipe(
       map((value: HttpResponse<string>) => {
